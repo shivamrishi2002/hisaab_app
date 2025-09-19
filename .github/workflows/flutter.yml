@@ -1,0 +1,41 @@
+name: Flutter Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout latest code
+      - uses: actions/checkout@v4
+
+      # Setup Flutter (latest stable)
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.24.0'   # apne local flutter --version ke hisaab se daal sakte ho
+
+      # Install dependencies
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Clean old builds
+      - name: Clean project
+        run: flutter clean
+
+      # Build release APK
+      - name: Build APK
+        run: flutter build apk --release
+
+      # Upload APK to GitHub Artifacts
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
